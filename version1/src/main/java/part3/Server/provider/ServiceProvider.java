@@ -1,5 +1,9 @@
 package part3.Server.provider;
 
+import part3.Server.serviceRegister.ServiceRegister;
+import part3.Server.serviceRegister.impl.ZKServiceRegisterImpl;
+
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,14 +11,20 @@ import java.util.Map;
  * 本地注册中心
  */
 public class ServiceProvider {
-    private final Map<String,Object> serviceMap;
+    private String host;
+    private int port;
+    private final Map<String, Object> serviceMap;
+    private ServiceRegister serviceRegister;
 
-    public ServiceProvider(Map<String,Object> serviceMap) {
+    public ServiceProvider(Map<String, Object> serviceMap) {
         this.serviceMap = serviceMap;
     }
 
-    public ServiceProvider() {
-        serviceMap = new HashMap<String,Object>();
+    public ServiceProvider(String host, int port) {
+        this.host = host;
+        this.port = port;
+        this.serviceMap = new HashMap<String, Object>();
+        this.serviceRegister = new ZKServiceRegisterImpl();
     }
 
     //本地注册
@@ -23,6 +33,8 @@ public class ServiceProvider {
 
         for (Class<?> i : interfaces) {
             serviceMap.put(i.getName(), service);
+            //在注册中心注册服务
+            serviceRegister.registerService(i.getName(), new InetSocketAddress(host, port));
         }
     }
 

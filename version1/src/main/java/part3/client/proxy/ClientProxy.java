@@ -2,7 +2,6 @@ package part3.client.proxy;
 
 import part3.client.rpcClient.RpcClient;
 import part3.client.rpcClient.impl.NettyClient;
-import part3.client.rpcClient.impl.SocketClient;
 import part3.common.message.RpcRequest;
 import part3.common.message.RpcResponse;
 
@@ -14,23 +13,14 @@ import java.lang.reflect.Proxy;
  * 客户端代理
  */
 public class ClientProxy implements InvocationHandler {
-    private RpcClient rpcClient;
+    private final RpcClient rpcClient;
 
     public ClientProxy(RpcClient rpcClient) {
         this.rpcClient = rpcClient;
     }
 
-    public ClientProxy(String host, int port, int chosen) {
-        switch (chosen) {
-            case 0:
-                this.rpcClient = new NettyClient(host, port);
-                break;
-            case 1:
-                this.rpcClient = new SocketClient(host, port);
-                break;
-            default:
-                break;
-        }
+    public ClientProxy() {
+        this.rpcClient = new NettyClient();
     }
 
     @Override

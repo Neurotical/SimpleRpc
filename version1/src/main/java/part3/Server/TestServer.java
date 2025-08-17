@@ -9,7 +9,7 @@ import part3.common.service.impl.UserServiceImpl;
 public class TestServer {
     public static void main(String[] args) {
         UserService userService = new UserServiceImpl();
-        ServiceProvider provider = new ServiceProvider();
+        ServiceProvider provider = new ServiceProvider("127.0.0.1", 9999);
         provider.registerService(userService);
 
         System.out.println("Server started");

@@ -8,8 +8,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import part3.client.netty.initializer.NettyClientInitializer;
 import part3.client.rpcClient.RpcClient;
+import part3.client.serviceCenter.ServiceCenter;
+import part3.client.serviceCenter.impl.ZKServiceCenterImpl;
 import part3.common.message.RpcRequest;
 import part3.common.message.RpcResponse;
+
+import java.net.InetSocketAddress;
 
 public class NettyClient implements RpcClient {
     private static final Bootstrap bootstrap;
@@ -21,18 +25,25 @@ public class NettyClient implements RpcClient {
                 .handler(new NettyClientInitializer());
     }
 
-    private String host;
-    private int port;
+    private final ServiceCenter serviceCenter;
 
-    public NettyClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public NettyClient() {
+        this.serviceCenter = new ZKServiceCenterImpl();
     }
 
     @Override
     public RpcResponse sendRequest(RpcRequest request) {
+        //发现服务,获取服务ip+port
+        InetSocketAddress inetSocketAddress = this.serviceCenter.discoverService(request.getInterfaceName());
+        if (inetSocketAddress == null) {
+            System.out.println("服务未找到:" + request.getInterfaceName());
+            return null;
+        }
+        String host = inetSocketAddress.getHostString();
+        int port = inetSocketAddress.getPort();
+
         try {
-            ChannelFuture sync = bootstrap.connect(this.host, this.port).sync();
+            ChannelFuture sync = bootstrap.connect(host, port).sync();
             //channel表示一个连接的单位，类似socket
             Channel channel = sync.channel();
             channel.writeAndFlush(request);
@@ -43,12 +54,9 @@ public class NettyClient implements RpcClient {
 
             return rpcResponse;
         } catch (InterruptedException e) {
-//            e.printStackTrace();
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getClass().getName());
-            System.out.println(e.getMessage());
         }
         return null;
     }
