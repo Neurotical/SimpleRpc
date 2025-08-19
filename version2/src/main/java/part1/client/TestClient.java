@@ -1,8 +1,8 @@
 package part1.client;
 
-import part3.client.proxy.ClientProxy;
-import part3.common.pojo.User;
-import part3.common.service.UserService;
+import part1.client.proxy.ClientProxy;
+import part1.common.pojo.User;
+import part1.common.service.UserService;
 
 public class TestClient {
     public static void main(String[] args) {

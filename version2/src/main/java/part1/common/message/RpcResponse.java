@@ -2,7 +2,7 @@ package part1.common.message;
 
 import lombok.Builder;
 import lombok.Data;
-import part3.common.enums.ExceptionCode;
+import part1.common.enums.ExceptionCode;
 
 import java.io.Serial;
 import java.io.Serializable;

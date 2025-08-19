@@ -1,9 +1,9 @@
 package part1.Server.server.impl;
 
 import lombok.AllArgsConstructor;
-import part3.Server.provider.ServiceProvider;
-import part3.Server.server.RpcServer;
-import part3.Server.server.thread.WorkThread;
+import part1.Server.provider.ServiceProvider;
+import part1.Server.server.RpcServer;
+import part1.Server.server.thread.WorkThread;
 
 import java.io.IOException;
 import java.net.ServerSocket;

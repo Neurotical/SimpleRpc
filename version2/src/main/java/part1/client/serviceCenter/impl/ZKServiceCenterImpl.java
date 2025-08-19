@@ -3,7 +3,7 @@ package part1.client.serviceCenter.impl;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import part3.client.serviceCenter.ServiceCenter;
+import part1.client.serviceCenter.ServiceCenter;
 
 import java.net.InetSocketAddress;
 import java.util.List;

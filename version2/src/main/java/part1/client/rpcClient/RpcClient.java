@@ -1,7 +1,7 @@
 package part1.client.rpcClient;
 
-import part3.common.message.RpcRequest;
-import part3.common.message.RpcResponse;
+import part1.common.message.RpcRequest;
+import part1.common.message.RpcResponse;
 
 public interface RpcClient {
 

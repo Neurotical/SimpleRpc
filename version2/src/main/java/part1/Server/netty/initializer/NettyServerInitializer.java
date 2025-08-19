@@ -9,8 +9,8 @@ import io.netty.handler.codec.serialization.ClassResolver;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.AllArgsConstructor;
-import part3.Server.netty.handler.NettyServerHandler;
-import part3.Server.provider.ServiceProvider;
+import part1.Server.netty.handler.NettyServerHandler;
+import part1.Server.provider.ServiceProvider;
 
 @AllArgsConstructor
 public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {

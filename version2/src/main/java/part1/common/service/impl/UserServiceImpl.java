@@ -1,7 +1,7 @@
 package part1.common.service.impl;
 
-import part3.common.pojo.User;
-import part3.common.service.UserService;
+import part1.common.pojo.User;
+import part1.common.service.UserService;
 
 import java.util.Random;
 import java.util.UUID;

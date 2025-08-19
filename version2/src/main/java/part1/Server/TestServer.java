@@ -1,10 +1,10 @@
 package part1.Server;
 
-import part3.Server.provider.ServiceProvider;
-import part3.Server.server.RpcServer;
-import part3.Server.server.impl.NettyRpcServer;
-import part3.common.service.UserService;
-import part3.common.service.impl.UserServiceImpl;
+import part1.Server.provider.ServiceProvider;
+import part1.Server.server.RpcServer;
+import part1.Server.server.impl.NettyRpcServer;
+import part1.common.service.UserService;
+import part1.common.service.impl.UserServiceImpl;
 
 public class TestServer {
     public static void main(String[] args) {

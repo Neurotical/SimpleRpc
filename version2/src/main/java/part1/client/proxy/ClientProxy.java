@@ -1,9 +1,9 @@
 package part1.client.proxy;
 
-import part3.client.rpcClient.RpcClient;
-import part3.client.rpcClient.impl.NettyClient;
-import part3.common.message.RpcRequest;
-import part3.common.message.RpcResponse;
+import part1.client.rpcClient.RpcClient;
+import part1.client.rpcClient.impl.NettyClient;
+import part1.common.message.RpcRequest;
+import part1.common.message.RpcResponse;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

@@ -8,7 +8,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.serialization.ClassResolver;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
-import part3.client.netty.handler.NettyClientHandler;
+import part1.client.netty.handler.NettyClientHandler;
 
 public class NettyClientInitializer extends ChannelInitializer<SocketChannel> {
 
