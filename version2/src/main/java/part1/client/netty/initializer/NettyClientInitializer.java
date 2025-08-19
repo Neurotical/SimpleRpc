@@ -3,32 +3,21 @@ package part1.client.netty.initializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.serialization.ClassResolver;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 import part1.client.netty.handler.NettyClientHandler;
+import part1.common.enums.SerializerType;
+import part1.common.nettyMsgChange.MyDecoder;
+import part1.common.nettyMsgChange.MyEncoder;
+import part1.common.serializer.JsonSerializer;
+import part1.common.serializer.SerializerFactory;
 
 public class NettyClientInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
+    protected void initChannel(SocketChannel socketChannel) {
         ChannelPipeline pipeline = socketChannel.pipeline();
-        //消息格式 【长度】【消息体】，解决沾包问题
-        pipeline.addLast(
-                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-        //计算当前待发送消息的长度，写入到前4个字节中
-        pipeline.addLast(new LengthFieldPrepender(4));
 
-        pipeline.addLast(new ObjectEncoder());
-        //在ObjectDecoder的构造函数中传入了一个ClassResolver 对象，用于解析类名并加载相应的类。
-        pipeline.addLast(new ObjectDecoder(new ClassResolver() {
-            @Override
-            public Class<?> resolve(String s) throws ClassNotFoundException {
-                return Class.forName(s);
-            }
-        }));
+        pipeline.addLast(new MyDecoder());
+        pipeline.addLast(new MyEncoder(new JsonSerializer()));
         pipeline.addLast(new NettyClientHandler());
     }
 }

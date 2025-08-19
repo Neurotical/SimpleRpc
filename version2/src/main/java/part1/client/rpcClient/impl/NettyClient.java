@@ -44,10 +44,12 @@ public class NettyClient implements RpcClient {
 
         try {
             ChannelFuture sync = bootstrap.connect(host, port).sync();
+            System.out.println("connected to " + host + ":" + port);
             //channel表示一个连接的单位，类似socket
             Channel channel = sync.channel();
             channel.writeAndFlush(request);
             channel.closeFuture().sync();
+            System.out.println("send request finished");
 
             AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse");
             RpcResponse rpcResponse = channel.attr(key).get();
