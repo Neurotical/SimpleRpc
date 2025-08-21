@@ -6,7 +6,13 @@ import part2.common.service.UserService;
 
 public class TestClient {
     public static void main(String[] args) {
-        ClientProxy clientProxy = new ClientProxy();
+        ClientProxy clientProxy = null;
+        try {
+            clientProxy = new ClientProxy();
+        }catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
 
         UserService userService = clientProxy.getProxy(UserService.class);
 

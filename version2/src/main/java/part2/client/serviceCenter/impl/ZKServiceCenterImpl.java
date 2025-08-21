@@ -3,7 +3,9 @@ package part2.client.serviceCenter.impl;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import part2.client.cache.ServiceCache;
 import part2.client.serviceCenter.ServiceCenter;
+import part2.client.serviceCenter.ZkWatcher;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -11,8 +13,9 @@ import java.util.List;
 public class ZKServiceCenterImpl implements ServiceCenter {
     private static final String ROOT_PATH = "SimpleRpc";
     private final CuratorFramework client;
+    private ZkWatcher zkWatcher;
 
-    public ZKServiceCenterImpl() {
+    public ZKServiceCenterImpl() throws InterruptedException {
         this.client = CuratorFrameworkFactory.builder()
                 .connectString("127.0.0.1:2181")
                 .sessionTimeoutMs(40000)
@@ -23,14 +26,24 @@ public class ZKServiceCenterImpl implements ServiceCenter {
         //注意要启动
         this.client.start();
 
+        //启动监听器
+        zkWatcher = new ZkWatcher(client);
+        zkWatcher.watchToUpdate(ROOT_PATH);
+
         System.out.println("ZKServiceCenterImpl created");
     }
 
     @Override
     public InetSocketAddress discoverService(String serviceName) {
         try {
-            List<String> strings = client.getChildren().forPath("/" + serviceName);
-            return parseAddressString(strings.get(0));
+            List<String> cacheAddressList = ServiceCache.getService(serviceName);
+            if (cacheAddressList == null || cacheAddressList.isEmpty()) {
+                System.out.println("query directly from zookeeper:" + serviceName);
+                cacheAddressList = client.getChildren().forPath("/" + serviceName);
+                ServiceCache.addService(serviceName,cacheAddressList);
+            }
+
+            return parseAddressString(cacheAddressList.get(0));
         } catch (Exception e) {
             e.printStackTrace();
         }
