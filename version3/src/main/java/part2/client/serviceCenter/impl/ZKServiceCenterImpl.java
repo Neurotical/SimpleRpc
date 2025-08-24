@@ -12,6 +12,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public class ZKServiceCenterImpl implements ServiceCenter {
+    private static final String RETRY = "RETRY";
     private static final String ROOT_PATH = "SimpleRpc";
     private final CuratorFramework client;
     private ZkWatcher zkWatcher;
@@ -39,7 +40,7 @@ public class ZKServiceCenterImpl implements ServiceCenter {
         try {
             List<String> cacheAddressList = ServiceCache.getService(serviceName);
             if (cacheAddressList == null || cacheAddressList.isEmpty()) {
-                System.out.println("query directly from zookeeper:" + serviceName);
+//                System.out.println("query directly from zookeeper:" + serviceName);
                 cacheAddressList = client.getChildren().forPath("/" + serviceName);
                 ServiceCache.addService(serviceName,cacheAddressList);
             }
@@ -50,6 +51,17 @@ public class ZKServiceCenterImpl implements ServiceCenter {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public boolean checkRetry(String serviceName) {
+        try {
+            List<String> serviceList = client.getChildren().forPath("/" + ZKServiceCenterImpl.RETRY);
+            return serviceList.contains(serviceName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private InetSocketAddress parseAddressString(String address) {

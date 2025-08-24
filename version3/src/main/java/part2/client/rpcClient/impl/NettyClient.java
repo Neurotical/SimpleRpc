@@ -31,6 +31,10 @@ public class NettyClient implements RpcClient {
         this.serviceCenter = new ZKServiceCenterImpl();
     }
 
+    public NettyClient(ServiceCenter serviceCenter) {
+        this.serviceCenter = serviceCenter;
+    }
+
     @Override
     public RpcResponse sendRequest(RpcRequest request) {
         //发现服务,获取服务ip+port
@@ -44,12 +48,12 @@ public class NettyClient implements RpcClient {
 
         try {
             ChannelFuture sync = bootstrap.connect(host, port).sync();
-            System.out.println("connected to " + host + ":" + port);
+//            System.out.println("connected to " + host + ":" + port);
             //channel表示一个连接的单位，类似socket
             Channel channel = sync.channel();
             channel.writeAndFlush(request);
             channel.closeFuture().sync();
-            System.out.println("send request finished");
+//            System.out.println("send request finished");
 
             AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse");
             RpcResponse rpcResponse = channel.attr(key).get();

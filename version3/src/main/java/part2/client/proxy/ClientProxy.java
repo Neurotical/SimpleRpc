@@ -1,7 +1,10 @@
 package part2.client.proxy;
 
+import part2.client.retry.GuavaRetry;
 import part2.client.rpcClient.RpcClient;
 import part2.client.rpcClient.impl.NettyClient;
+import part2.client.serviceCenter.ServiceCenter;
+import part2.client.serviceCenter.impl.ZKServiceCenterImpl;
 import part2.common.message.RpcRequest;
 import part2.common.message.RpcResponse;
 
@@ -14,13 +17,15 @@ import java.lang.reflect.Proxy;
  */
 public class ClientProxy implements InvocationHandler {
     private final RpcClient rpcClient;
+    private ServiceCenter serviceCenter;
 
     public ClientProxy(RpcClient rpcClient) {
         this.rpcClient = rpcClient;
     }
 
     public ClientProxy() throws InterruptedException {
-        this.rpcClient = new NettyClient();
+        this.serviceCenter = new ZKServiceCenterImpl();
+        this.rpcClient = new NettyClient(this.serviceCenter);
     }
 
     @Override
@@ -34,7 +39,15 @@ public class ClientProxy implements InvocationHandler {
 
         System.out.println("request: " + request);
 
-        RpcResponse rpcResponse = rpcClient.sendRequest(request);
+        RpcResponse rpcResponse;
+        //在重传白名单中时进行重传
+        if (serviceCenter.checkRetry(request.getInterfaceName())){
+            System.out.println(request.getInterfaceName() + " retry");
+            rpcResponse = new GuavaRetry().sendRequestWithRetry(request, rpcClient);
+        }
+        else{
+            rpcResponse = rpcClient.sendRequest(request);
+        }
 
         System.out.println("rpcResponse: " + rpcResponse);
 

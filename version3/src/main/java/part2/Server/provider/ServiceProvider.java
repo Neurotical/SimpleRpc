@@ -28,13 +28,13 @@ public class ServiceProvider {
     }
 
     //本地注册
-    public void registerService(Object service) {
+    public void registerService(Object service,boolean retry) {
         Class<?>[] interfaces = service.getClass().getInterfaces();
 
         for (Class<?> i : interfaces) {
             serviceMap.put(i.getName(), service);
             //在注册中心注册服务
-            serviceRegister.registerService(i.getName(), new InetSocketAddress(host, port));
+            serviceRegister.registerService(i.getName(), new InetSocketAddress(host, port),retry);
         }
     }
 

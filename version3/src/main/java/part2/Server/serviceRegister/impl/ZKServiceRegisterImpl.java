@@ -15,6 +15,8 @@ public class ZKServiceRegisterImpl implements ServiceRegister {
 
     //zookeeper根路径节点
     private static final String ROOT_PATH = "SimpleRpc";
+    //重传白名单根路径节点
+    private static final String RETRY = "RETRY";
     // curator 提供的zookeeper客户端
     private final CuratorFramework client;
 
@@ -30,7 +32,7 @@ public class ZKServiceRegisterImpl implements ServiceRegister {
     }
 
     @Override
-    public void registerService(String serviceName, InetSocketAddress address) {
+    public void registerService(String serviceName, InetSocketAddress address, boolean retry) {
         try {
             // serviceName创建成永久节点，服务提供者下线时，不删服务名，只删地址
             if (client.checkExists().forPath("/" + serviceName) == null) {
@@ -46,6 +48,16 @@ public class ZKServiceRegisterImpl implements ServiceRegister {
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.EPHEMERAL)
                     .forPath(addressString);
+
+            //添加白名单
+            if (retry) {
+                addressString = "/" + RETRY + "/" + serviceName;
+                System.out.println(addressString);
+                client.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.EPHEMERAL)
+                        .forPath(addressString);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
