@@ -1,5 +1,6 @@
 package part1.Server.provider;
 
+import part1.Server.rateLimit.provider.RateLimitProvider;
 import part1.Server.serviceRegister.ServiceRegister;
 import part1.Server.serviceRegister.impl.ZKServiceRegisterImpl;
 
@@ -15,6 +16,7 @@ public class ServiceProvider {
     private int port;
     private final Map<String, Object> serviceMap;
     private ServiceRegister serviceRegister;
+    private RateLimitProvider rateLimitProvider;
 
     public ServiceProvider(Map<String, Object> serviceMap) {
         this.serviceMap = serviceMap;
@@ -25,6 +27,7 @@ public class ServiceProvider {
         this.port = port;
         this.serviceMap = new HashMap<String, Object>();
         this.serviceRegister = new ZKServiceRegisterImpl();
+        this.rateLimitProvider = new RateLimitProvider();
     }
 
     //本地注册
@@ -41,5 +44,9 @@ public class ServiceProvider {
     //获取服务实例
     public Object getService(String interfaceName) {
         return serviceMap.get(interfaceName);
+    }
+
+    public RateLimitProvider getRateLimitProvider() {
+        return rateLimitProvider;
     }
 }
