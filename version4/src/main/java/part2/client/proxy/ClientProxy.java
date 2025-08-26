@@ -1,5 +1,7 @@
 package part2.client.proxy;
 
+import part2.client.circuitBreaker.CircuitBreaker;
+import part2.client.circuitBreaker.CircuitBreakerProvider;
 import part2.client.retry.GuavaRetry;
 import part2.client.rpcClient.RpcClient;
 import part2.client.rpcClient.impl.NettyClient;
@@ -18,6 +20,7 @@ import java.lang.reflect.Proxy;
 public class ClientProxy implements InvocationHandler {
     private final RpcClient rpcClient;
     private ServiceCenter serviceCenter;
+    private CircuitBreakerProvider circuitBreakerProvider;
 
     public ClientProxy(RpcClient rpcClient) {
         this.rpcClient = rpcClient;
@@ -26,6 +29,7 @@ public class ClientProxy implements InvocationHandler {
     public ClientProxy() throws InterruptedException {
         this.serviceCenter = new ZKServiceCenterImpl();
         this.rpcClient = new NettyClient(this.serviceCenter);
+        this.circuitBreakerProvider=new CircuitBreakerProvider();
     }
 
     @Override
@@ -39,6 +43,12 @@ public class ClientProxy implements InvocationHandler {
 
         System.out.println("request: " + request);
 
+        CircuitBreaker circuitBreaker = circuitBreakerProvider.getCircuitBreaker(request.getInterfaceName());
+        if (!circuitBreaker.allowRequest()){
+            System.out.println("circuitBreaker not allow request");
+            return null;
+        }
+
         RpcResponse rpcResponse;
         //在重传白名单中时进行重传
         if (serviceCenter.checkRetry(request.getInterfaceName())){
@@ -47,6 +57,14 @@ public class ClientProxy implements InvocationHandler {
         }
         else{
             rpcResponse = rpcClient.sendRequest(request);
+        }
+
+        //记录response的状态，上报给熔断器
+        if (rpcResponse.getCode() ==200){
+            circuitBreaker.recordSuccess();
+        }
+        if (rpcResponse.getCode()==500){
+            circuitBreaker.recordFailure();
         }
 
         System.out.println("rpcResponse: " + rpcResponse);
